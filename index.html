@@ -1310,19 +1310,29 @@
             renderOfficerList() {
                 const listElement = document.getElementById('officerList');
                 const today = new Date();
-                const past1y = new Date(today);
-                past1y.setFullYear(past1y.getFullYear() - 1);
-                const future1y = new Date(today);
-                future1y.setFullYear(future1y.getFullYear() + 1);
-                
-                // 満了日ベースでフィルタリング（直近±1年の満了対象）
-                const relevantOfficers = this.officers.filter(officer => {
-                    const expiryDate = new Date(officer.expiryDate);
-                    return expiryDate >= past1y && expiryDate <= future1y;
-                });
+const currentYear = today.getFullYear();
+const currentMonth = today.getMonth();
+
+const nextMonthDate = new Date(currentYear, currentMonth + 1, 1);
+const nextMonthYear = nextMonthDate.getFullYear();
+const nextMonth = nextMonthDate.getMonth();
+
+// 満了日ベースでフィルタリング（過去すべて＋今月＋来月）
+const relevantOfficers = this.officers.filter(officer => {
+    const expiryDate = new Date(officer.expiryDate);
+
+    const expiryYear = expiryDate.getFullYear();
+    const expiryMonth = expiryDate.getMonth();
+
+    const isPast = expiryDate < today;
+    const isThisMonth = expiryYear === currentYear && expiryMonth === currentMonth;
+    const isNextMonth = expiryYear === nextMonthYear && expiryMonth === nextMonth;
+
+    return isPast || isThisMonth || isNextMonth;
+});
                 
                 if (relevantOfficers.length === 0) {
-                    listElement.innerHTML = '<p>直近±1年の満了対象はありません。</p>';
+                    listElement.innerHTML = '<p>過去分・今月分・来月分の満了対象はありません。</p>';
                     return;
                 }
                 
