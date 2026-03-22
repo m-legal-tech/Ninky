@@ -4,28 +4,1909 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ninky</title>
+    
+    <!-- PWA メタタグ -->
+    <meta name="description" content="任期管理を自動化！プロのための役員管理プラットフォーム。">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Ninky">
+    <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="msapplication-tap-highlight" content="no">
+    
+    <!-- PWA マニフェスト -->
+    <link rel="manifest" href="./ninky-manifest.json">
+    
+    <!-- PWA アイコン（iOS対応・正式アイコン統一） -->
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .edit-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            margin-right: 5px;
+        }
+
+        .officer-list {
+            margin-top: 20px;
+        }
+
+        .officer-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .officer-info {
+            flex-grow: 1;
+        }
+
+        .officer-info strong {
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .officer-details {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .expiry-date {
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin-left: 15px;
+        }
+
+        .expiry-soon {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .expiry-normal {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .expiry-expired {
+            background-color: #ffcdd2;
+            color: #d32f2f;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .delete-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+
+        .notification-panel {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .notification-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .notification-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #f0e68c;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .month-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .month-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .month-header {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+        }
+
+        .month-content {
+            padding: 15px;
+        }
+
+        .company-expiry {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .export-section {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .month-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .officer-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+        
+        /* 司法書士実務最適化: 視認性向上CSS */
+        
+        /* 満了予定/満了済みブロック表示 */
+        .expiry-block {
+            margin-bottom: 20px;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .upcoming-block {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f1f8e9 100%);
+            border-color: #4caf50;
+        }
+        
+        .expired-block {
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            border-color: #bdbdbd;
+        }
+        
+        .block-title {
+            background: rgba(0, 0, 0, 0.05);
+            margin: 0;
+            padding: 12px 16px;
+            font-weight: bold;
+            font-size: 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .upcoming-block .block-title {
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+        }
+        
+        .expired-block .block-title {
+            background: linear-gradient(135deg, #757575, #9e9e9e);
+            color: white;
+        }
+        
+        .officer-items {
+            padding: 16px;
+        }
+        
+        .expired-item {
+            opacity: 0.8;
+        }
+        
+        .expiry-critical {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            color: white;
+            font-weight: bold;
+        }
+        
+        /* 年フレーム表示 */
+        .year-frame {
+            margin-bottom: 24px;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+        }
+        
+        .year-title {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 16px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .month-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            padding: 20px;
+        }
+        
+        .month-card {
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .month-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .month-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 16px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .company-expiry {
+            padding: 12px;
+            border-bottom: 1px solid #f5f5f5;
+            line-height: 1.4;
+        }
+        
+        .company-expiry:last-child {
+            border-bottom: none;
+        }
+        
+        /* 月別一覧の編集・削除ボタン */
+        .company-expiry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .company-info {
+            flex: 1;
+        }
+        
+        .month-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: 10px;
+        }
+        
+        .month-actions .edit-btn,
+        .month-actions .delete-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .month-actions .edit-btn {
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+        }
+        
+        .month-actions .edit-btn:hover {
+            background: linear-gradient(135deg, #388e3c, #4caf50);
+            transform: translateY(-1px);
+        }
+        
+        .month-actions .delete-btn {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            color: white;
+        }
+        
+        .month-actions .delete-btn:hover {
+            background: linear-gradient(135deg, #d32f2f, #f44336);
+            transform: translateY(-1px);
+        }
+        
+        /* 次回任期バッジ */
+        .next-term-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff9800, #ffc107);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+        }
+        
+        /* レスポンシブ調整 */
+        @media (max-width: 768px) {
+            .month-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                padding: 16px;
+            }
+            
+            .year-title {
+                padding: 12px 16px;
+                font-size: 16px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>🚨 満了アラート</h1>
-    <div id="officerList"></div>
-    <script>
-        function renderOfficerList(officers) {
-            const today = new Date();
-            const expiredOfficers = officers.filter(officer => new Date(officer.expiryDate) < today);
-            const thisMonthOfficers = officers.filter(officer => new Date(officer.expiryDate).getMonth() === today.getMonth() && new Date(officer.expiryDate).getFullYear() === today.getFullYear());
-            const nextMonthOfficers = officers.filter(officer => new Date(officer.expiryDate).getMonth() === (today.getMonth() + 1) % 12 && new Date(officer.expiryDate).getFullYear() === today.getFullYear());
-            let content = '';
+    <div class="container">
+        <div class="header">
+            <h1>Ninky</h1>
+            <p>任期管理を自動化！プロのための役員管理プラットフォーム。</p>
+        </div>
 
-            if (expiredOfficers.length === 0 && thisMonthOfficers.length === 0 && nextMonthOfficers.length === 0) {
-                content = '<p>経過済み・今月・翌月の満了対象はありません。</p>';
-            } else {
-                content += '<h2>経過済み</h2>' + expiredOfficers.map(officer => `<p>${officer.name} (Expires on: ${officer.expiryDate})</p>`).join('');
-                content += '<h2>今月満了予定</h2>' + thisMonthOfficers.map(officer => `<p>${officer.name} (Expires on: ${officer.expiryDate})</p>`).join('');
-                content += '<h2>翌月満了予定</h2>' + nextMonthOfficers.map(officer => `<p>${officer.name} (Expires on: ${officer.expiryDate})</p>`).join('');
+        <!-- 通知パネル -->
+        <div id="notificationPanel" class="notification-panel">
+            <div class="notification-title">📅 今月満了予定の役員任期があります</div>
+            <div id="notificationContent"></div>
+        </div>
+
+        <!-- 統計情報 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number" id="totalCompanies">0</span>
+                <div class="stat-label">管理会社数</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="totalOfficers">0</span>
+                <div class="stat-label">登録役員数</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="expiringSoon">0</span>
+                <div class="stat-label">3ヶ月以内満了</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="expired">0</span>
+                <div class="stat-label">満了済み</div>
+            </div>
+        </div>
+
+        <!-- 会社・役員登録フォーム -->
+        <div class="card">
+            <h2>新規会社・役員登録</h2>
+            <form id="officerForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="corporationType">任期類型</label>
+                        <select id="corporationType" required>
+                            <option value="">選択してください</option>
+                            <option value="general_meeting">定時総会終結時</option>
+                            <option value="fixed_years">固定年数</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="companyName">会社等法人名</label>
+                        <input type="text" id="companyName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fiscalMonth">事業年度末（月）</label>
+                        <select id="fiscalMonth" required>
+                            <option value="">選択してください</option>
+                            <option value="1">1月（末日）</option>
+                            <option value="2">2月（末日）</option>
+                            <option value="3">3月（末日）</option>
+                            <option value="4">4月（末日）</option>
+                            <option value="5">5月（末日）</option>
+                            <option value="6">6月（末日）</option>
+                            <option value="7">7月（末日）</option>
+                            <option value="8">8月（末日）</option>
+                            <option value="9">9月（末日）</option>
+                            <option value="10">10月（末日）</option>
+                            <option value="11">11月（末日）</option>
+                            <option value="12">12月（末日）</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="gracePeriodGroup" style="display: none;">
+                        <label for="gracePeriodMonths">定時総会開催目安（月）</label>
+                        <select id="gracePeriodMonths">
+                            <option value="1">1ヶ月</option>
+                            <option value="2">2ヶ月</option>
+                            <option value="3" selected>3ヶ月</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="officerType">役員種別</label>
+                        <select id="officerType" required>
+                            <option value="">選択してください</option>
+                            <option value="取締役">取締役</option>
+                            <option value="監査役">監査役</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointmentDate">就任年月日</label>
+                        <input type="date" id="appointmentDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="termYears">任期（年）</label>
+                        <select id="termYears" required>
+                            <option value="">選択してください</option>
+                            <option value="1">1年</option>
+                            <option value="2">2年</option>
+                            <option value="3">3年</option>
+                            <option value="4">4年</option>
+                            <option value="5">5年</option>
+                            <option value="6">6年</option>
+                            <option value="7">7年</option>
+                            <option value="8">8年</option>
+                            <option value="9">9年</option>
+                            <option value="10">10年</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit">役員情報登録</button>
+                <button type="reset">リセット</button>
+            </form>
+        </div>
+
+        <!-- 直近1年の満了予定／満了済（一覧） -->
+        <div class="card">
+            <h2>📋 直近1年の満了予定・満了済（一覧）</h2>
+            <div id="officerList" class="officer-list"></div>
+        </div>
+
+        <!-- 月別任期満了一覧（満了予定がある月のみ表示） -->
+        <div class="card">
+            <h2>📅 月別任期満了一覧 <span style="font-size: 14px; color: #666; font-weight: normal;">※満了予定がある月のみ表示</span></h2>
+            <div id="monthlyView" class="month-grid"></div>
+            <div class="export-section">
+                <input type="file" id="csvInput" accept=".csv" style="display: none;">
+                <button id="importBtn">CSV一括インポート</button>
+                <button id="exportBtn">CSV出力</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 編集モーダル -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>役員情報編集</h2>
+            <form id="editForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editCorporationType">任期類型</label>
+                        <select id="editCorporationType" required>
+                            <option value="general_meeting">定時総会終結時</option>
+                            <option value="fixed_years">固定年数</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editCompanyName">会社等法人名</label>
+                        <input type="text" id="editCompanyName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editFiscalMonth">事業年度末（月）</label>
+                        <select id="editFiscalMonth" required>
+                            <option value="1">1月（末日）</option>
+                            <option value="2">2月（末日）</option>
+                            <option value="3">3月（末日）</option>
+                            <option value="4">4月（末日）</option>
+                            <option value="5">5月（末日）</option>
+                            <option value="6">6月（末日）</option>
+                            <option value="7">7月（末日）</option>
+                            <option value="8">8月（末日）</option>
+                            <option value="9">9月（末日）</option>
+                            <option value="10">10月（末日）</option>
+                            <option value="11">11月（末日）</option>
+                            <option value="12">12月（末日）</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="editGracePeriodGroup" style="display: none;">
+                        <label for="editGracePeriodMonths">事業年度終了後の定時総会開催目安（月）</label>
+                        <select id="editGracePeriodMonths">
+                            <option value="1">1ヶ月</option>
+                            <option value="2">2ヶ月</option>
+                            <option value="3" selected>3ヶ月</option>
+                        </select>
+                        <small style="color: #666; font-size: 0.85em; display: block; margin-top: 5px;">
+                            ※ 通常は3ヶ月以内です。実際の開催月が確定している場合のみ変更してください。
+                        </small>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editOfficerType">役員種別</label>
+                        <select id="editOfficerType" required>
+                            <option value="取締役">取締役</option>
+                            <option value="監査役">監査役</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAppointmentDate">就任年月日</label>
+                        <input type="date" id="editAppointmentDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editTermYears">任期（年）</label>
+                        <select id="editTermYears" required>
+                            <option value="1">1年</option>
+                            <option value="2">2年</option>
+                            <option value="3">3年</option>
+                            <option value="4">4年</option>
+                            <option value="5">5年</option>
+                            <option value="6">6年</option>
+                            <option value="7">7年</option>
+                            <option value="8">8年</option>
+                            <option value="9">9年</option>
+                            <option value="10">10年</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit">更新</button>
+                <button type="button" onclick="officerManager.closeEditModal()">キャンセル</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        class OfficerManager {
+            constructor() {
+                this.officers = JSON.parse(localStorage.getItem('officers')) || [];
+                this.currentEditId = null;
+                this.editingOfficerId = null; // 月別一覧からの編集用ID管理
+                
+                // 任期類型別の役員種別定義
+                this.officerTypesByCorpType = {
+                    'general_meeting': [
+                        { value: '取締役', text: '取締役', defaultTerm: 2 },
+                        { value: '代表取締役', text: '代表取締役', defaultTerm: 2 },
+                        { value: '監査役', text: '監査役', defaultTerm: 4 },
+                        { value: '理事', text: '理事', defaultTerm: 2 },
+                        { value: '代表理事', text: '代表理事', defaultTerm: 2 },
+                        { value: '会計監査人', text: '会計監査人', defaultTerm: 1 }
+                    ],
+                    'fixed_years': [
+                        { value: '理事長', text: '理事長', defaultTerm: 2 },
+                        { value: '理事', text: '理事', defaultTerm: 2 },
+                        { value: '監事', text: '監事', defaultTerm: 2 }
+                    ]
+                };
+                
+                // 【重大バグ修正】既存データの任期満了日を正しく再計算
+                this.migrateExistingData();
+                
+                this.init();
             }
 
-            document.getElementById('officerList').innerHTML = content;
+            init() {
+                this.renderOfficerList();
+                this.renderMonthlyView();
+                this.updateStats();
+                this.checkNotifications();
+                this.setupEventListeners();
+                
+                // 毎日の通知チェック
+                setInterval(() => this.checkNotifications(), 24 * 60 * 60 * 1000);
+            }
+            
+            migrateExistingData() {
+                // 【重大バグ修正＋法人類型追加】既存データのマイグレーション
+                let dataUpdated = false;
+                
+                this.officers.forEach(officer => {
+                    // 【後方互換性】旧値から新値への変換
+                    if (officer.termRule === 'company_law' || officer.termRule === 'general_meeting_term') {
+                        officer.termRule = 'general_meeting';
+                        dataUpdated = true;
+                        console.log(`[マイグレーション] ${officer.companyName} ${officer.officerType}: termRule変換 (→ general_meeting)`);
+                    } else if (officer.termRule === 'fixed_anniversary' || officer.termRule === 'fixed_term') {
+                        officer.termRule = 'fixed_years';
+                        dataUpdated = true;
+                        console.log(`[マイグレーション] ${officer.companyName} ${officer.officerType}: termRule変換 (→ fixed_years)`);
+                    }
+                    
+                    // 任期類型（termRule）が未設定の場合はデフォルト値を設定
+                    if (!officer.termRule) {
+                        officer.termRule = 'general_meeting'; // デフォルトは定時総会終結時
+                        dataUpdated = true;
+                        console.log(`[マイグレーション] ${officer.companyName} ${officer.officerType}: termRule追加 (定時総会終結時)`);
+                    }
+                    
+                    // 定時総会開催目安（gracePeriodMonths）が未設定の場合はデフォルト値を設定
+                    if (officer.termRule === 'general_meeting' && !officer.gracePeriodMonths) {
+                        officer.gracePeriodMonths = 3; // デフォルトは3ヶ月
+                        dataUpdated = true;
+                        console.log(`[マイグレーション] ${officer.companyName} ${officer.officerType}: gracePeriodMonths追加 (3ヶ月)`);
+                    }
+                    
+                    if (officer.appointmentDate && officer.fiscalMonth && officer.termYears) {
+                        // 現在の満了日を保存
+                        const oldExpiryDate = new Date(officer.expiryDate);
+                        
+                        // 正しい方式で再計算（termRuleと猶予月数を考慮）
+                        const gracePeriodMonths = officer.gracePeriodMonths || 3;
+                        const newExpiryDate = this.calculateExpiryDate(
+                            new Date(officer.appointmentDate), 
+                            officer.fiscalMonth, 
+                            officer.termYears,
+                            officer.termRule,
+                            gracePeriodMonths
+                        );
+                        
+                        // 日付が変わった場合のみ更新
+                        if (oldExpiryDate.getTime() !== newExpiryDate.getTime()) {
+                            officer.expiryDate = newExpiryDate.toISOString();
+                            dataUpdated = true;
+                            console.log(`[バグ修正] ${officer.companyName} ${officer.officerType}: ${oldExpiryDate.toLocaleDateString()} → ${newExpiryDate.toLocaleDateString()}`);
+                        }
+                    }
+                });
+                
+                // データが更新された場合は保存
+                if (dataUpdated) {
+                    this.saveData();
+                    console.log(`[バグ修正完了] ${this.officers.length}件の役員データをチェック、修正されたデータを保存しました。`);
+                }
+            }
+
+            setupEventListeners() {
+                // 法人類型変更時の動的切り替え
+                document.getElementById('corporationType').addEventListener('change', (e) => {
+                    this.updateOfficerTypeOptions('officerType', e.target.value);
+                    this.updateFiscalMonthVisibility(e.target.value);
+                });
+                
+                document.getElementById('editCorporationType').addEventListener('change', (e) => {
+                    this.updateOfficerTypeOptions('editOfficerType', e.target.value);
+                    this.updateFiscalMonthVisibility(e.target.value, 'edit');
+                });
+                
+                document.getElementById('officerForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addOfficer();
+                });
+
+                document.getElementById('editForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.updateOfficer();
+                });
+
+                document.getElementById('exportBtn').addEventListener('click', () => {
+                    this.exportData();
+                });
+
+                document.getElementById('importBtn').addEventListener('click', () => {
+                    document.getElementById('csvInput').click();
+                });
+
+                document.getElementById('csvInput').addEventListener('change', (e) => {
+                    this.importData(e);
+                });
+
+                // 役員種別に応じた任期のデフォルト設定（法人類型対応）
+                document.getElementById('officerType').addEventListener('change', (e) => {
+                    const corporationType = document.getElementById('corporationType').value;
+                    this.setDefaultTermYears('termYears', corporationType, e.target.value);
+                });
+                
+                document.getElementById('editOfficerType').addEventListener('change', (e) => {
+                    const corporationType = document.getElementById('editCorporationType').value;
+                    this.setDefaultTermYears('editTermYears', corporationType, e.target.value);
+                });
+
+                // モーダルクローズイベント
+                document.querySelector('.close').addEventListener('click', () => {
+                    this.closeEditModal();
+                });
+
+                window.addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('editModal')) {
+                        this.closeEditModal();
+                    }
+                });
+            }
+            
+            // 法人類型と役員種別に応じたデフォルト任期の設定
+            setDefaultTermYears(termSelectId, corporationType, officerType) {
+                const termSelect = document.getElementById(termSelectId);
+                if (!corporationType || !officerType || !termSelect) return;
+                
+                const officerTypes = this.officerTypesByCorpType[corporationType];
+                const selectedType = officerTypes?.find(type => type.value === officerType);
+                
+                if (selectedType && selectedType.defaultTerm) {
+                    termSelect.value = selectedType.defaultTerm.toString();
+                }
+            }
+
+            // 指定年月の月末日を取得する共通関数
+            getLastDayOfMonth(year, month1to12) {
+                // month1to12: 1-12の月番号
+                return new Date(year, month1to12, 0).getDate();
+            }
+
+            // 和暦変換関数
+            toJapaneseDate(date) {
+                const d = new Date(date);
+                const year = d.getFullYear();
+                const month = d.getMonth() + 1;
+                const day = d.getDate();
+
+                let era = '';
+                let eraYear = 0;
+
+                if (year >= 2019) {
+                    era = '令和';
+                    eraYear = year - 2018;
+                } else if (year >= 1989) {
+                    era = '平成';
+                    eraYear = year - 1988;
+                } else if (year >= 1926) {
+                    era = '昭和';
+                    eraYear = year - 1925;
+                }
+
+                return `${era}${eraYear}年${month}月${day}日`;
+            }
+
+            // 月別一覧からの編集（メインフォームに値を反映）
+            editFromMonthly(id) {
+                const officer = this.officers.find(o => o.id === id);
+                if (!officer) return;
+
+                // 編集モードに設定
+                this.editingOfficerId = id;
+                
+                // 任期類型を設定（未設定の場合はデフォルト値）
+                const termRule = officer.termRule || 'general_meeting';
+                document.getElementById('corporationType').value = termRule;
+                
+                // 役員種別選択肢を更新
+                this.updateOfficerTypeOptions('officerType', termRule);
+                
+                // 事業年度末表示制御
+                this.updateFiscalMonthVisibility(termRule);
+                
+                // メインフォームに値を設定
+                document.getElementById('companyName').value = officer.companyName;
+                document.getElementById('fiscalMonth').value = officer.fiscalMonth;
+                document.getElementById('officerType').value = officer.officerType;
+                
+                // 就任日を YYYY-MM-DD 形式に変換
+                const appointmentDate = new Date(officer.appointmentDate);
+                const dateStr = appointmentDate.getFullYear() + '-' + 
+                              String(appointmentDate.getMonth() + 1).padStart(2, '0') + '-' + 
+                              String(appointmentDate.getDate()).padStart(2, '0');
+                document.getElementById('appointmentDate').value = dateStr;
+                
+                document.getElementById('termYears').value = officer.termYears;
+                
+                // 定時総会開催目安の設定（定時総会終結時の場合のみ、未設定時はデフォルト3ヶ月）
+                if (termRule === 'general_meeting') {
+                    const gracePeriodSelect = document.getElementById('gracePeriodMonths');
+                    if (gracePeriodSelect) {
+                        gracePeriodSelect.value = officer.gracePeriodMonths || 3;
+                    }
+                }
+                
+                // 送信ボタンを「更新」に変更
+                const submitBtn = document.querySelector('#officerForm button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.textContent = '更新';
+                }
+                
+                // 上部へスクロール
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            
+            // 法人類型に応じた役員種別選択肢の更新
+            updateOfficerTypeOptions(selectId, corporationType) {
+                const select = document.getElementById(selectId);
+                const termSelect = document.getElementById(selectId === 'officerType' ? 'termYears' : 'editTermYears');
+                
+                // 現在の選択値を保存
+                const currentValue = select.value;
+                
+                // 選択肢をクリア
+                select.innerHTML = '<option value="">選択してください</option>';
+                
+                if (corporationType && this.officerTypesByCorpType[corporationType]) {
+                    this.officerTypesByCorpType[corporationType].forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type.value;
+                        option.textContent = type.text;
+                        select.appendChild(option);
+                    });
+                }
+                
+                // 以前の選択値が新しい選択肢にあれば復元
+                if (currentValue && Array.from(select.options).some(opt => opt.value === currentValue)) {
+                    select.value = currentValue;
+                } else {
+                    // 任期年数をリセット
+                    if (termSelect) {
+                        termSelect.value = '';
+                    }
+                }
+            }
+            
+            // 事業年度末入力欄と定時総会開催目安入力欄の表示/非表示制御
+            updateFiscalMonthVisibility(corporationType, prefix = '') {
+                const fiscalGroup = document.querySelector(`#${prefix}fiscalMonth`.replace(/^#edit/, '#editFiscalMonth').replace(/^#$/, '#fiscalMonth')).closest('.form-group');
+                const gracePeriodGroupId = prefix === 'edit' ? 'editGracePeriodGroup' : 'gracePeriodGroup';
+                const gracePeriodGroup = document.getElementById(gracePeriodGroupId);
+                
+                if (corporationType === 'fixed_years') {
+                    // 固定年数の場合は事業年度末と定時総会開催目安を非表示
+                    fiscalGroup.style.display = 'none';
+                    if (gracePeriodGroup) {
+                        gracePeriodGroup.style.display = 'none';
+                    }
+                    // 値をクリア（任期計算に影響しないようにダミー値を設定）
+                    fiscalGroup.querySelector('select').value = '3'; // ダミー値
+                } else if (corporationType === 'general_meeting') {
+                    // 定時総会終結時の場合は両方とも表示
+                    fiscalGroup.style.display = 'block';
+                    if (gracePeriodGroup) {
+                        gracePeriodGroup.style.display = 'block';
+                    }
+                } else {
+                    // 未選択の場合は定時総会開催目安のみ非表示
+                    if (gracePeriodGroup) {
+                        gracePeriodGroup.style.display = 'none';
+                    }
+                }
+            }
+
+            addOfficer() {
+                const corporationType = document.getElementById('corporationType').value;
+                const companyName = document.getElementById('companyName').value;
+                const fiscalMonth = parseInt(document.getElementById('fiscalMonth').value);
+                const officerType = document.getElementById('officerType').value;
+                const appointmentDate = document.getElementById('appointmentDate').value;
+                const termYears = parseInt(document.getElementById('termYears').value);
+                
+                // 定時総会開催目安の取得（定時総会終結時のみ、デフォルト3ヶ月）
+                let gracePeriodMonths = 3;
+                if (corporationType === 'general_meeting') {
+                    const gracePeriodSelect = document.getElementById('gracePeriodMonths');
+                    gracePeriodMonths = gracePeriodSelect ? parseInt(gracePeriodSelect.value) || 3 : 3;
+                }
+
+                if (this.editingOfficerId) {
+                    // 更新処理
+                    const officerIndex = this.officers.findIndex(o => o.id === this.editingOfficerId);
+                    if (officerIndex !== -1) {
+                        // 既存のofficerを更新
+                        this.officers[officerIndex] = {
+                            ...this.officers[officerIndex], // 既存データを保持
+                            termRule: corporationType,
+                            gracePeriodMonths: gracePeriodMonths,
+                            companyName,
+                            fiscalMonth,
+                            officerType,
+                            appointmentDate: new Date(appointmentDate),
+                            termYears,
+                            expiryDate: this.calculateExpiryDate(new Date(appointmentDate), fiscalMonth, termYears, corporationType, gracePeriodMonths),
+                            updatedAt: new Date()
+                        };
+                        
+                        // 編集モードを解除
+                        this.editingOfficerId = null;
+                        
+                        // 送信ボタンを「登録」に戻す
+                        const submitBtn = document.querySelector('#officerForm button[type="submit"]');
+                        if (submitBtn) {
+                            submitBtn.textContent = '登録';
+                        }
+                        
+                        alert('役員情報を更新しました。\n\n※ 実際の任期期間は定款等をご確認ください。\n本システムは任期満了予定日の目安を提供します。');
+                    }
+                } else {
+                    // 新規追加処理
+                    const officer = {
+                        id: Date.now(),
+                        termRule: corporationType,
+                        gracePeriodMonths: gracePeriodMonths,
+                        companyName,
+                        fiscalMonth,
+                        officerType,
+                        appointmentDate: new Date(appointmentDate),
+                        termYears,
+                        expiryDate: this.calculateExpiryDate(new Date(appointmentDate), fiscalMonth, termYears, corporationType, gracePeriodMonths),
+                        createdAt: new Date()
+                    };
+
+                    this.officers.push(officer);
+                    alert('役員情報を登録しました。\n\n※ 実際の任期期間は定款等をご確認ください。\n本システムは任期満了予定日の目安を提供します。');
+                }
+
+                // 共通の後処理
+                this.saveData();
+                this.renderOfficerList();
+                this.renderMonthlyView();
+                this.updateStats();
+                this.checkNotifications();
+                
+                // フォームリセット
+                document.getElementById('officerForm').reset();
+            }
+
+            editOfficer(id) {
+                const officer = this.officers.find(o => o.id === id);
+                if (!officer) return;
+
+                this.currentEditId = id;
+                
+                // 任期類型を設定（未設定の場合はデフォルト値）
+                const termRule = officer.termRule || 'general_meeting';
+                document.getElementById('editCorporationType').value = termRule;
+                
+                // 役員種別選択肢を更新
+                this.updateOfficerTypeOptions('editOfficerType', termRule);
+                
+                // 事業年度末表示制御
+                this.updateFiscalMonthVisibility(termRule, 'edit');
+                
+                // モーダルにデータを設定
+                document.getElementById('editCompanyName').value = officer.companyName;
+                document.getElementById('editFiscalMonth').value = officer.fiscalMonth;
+                document.getElementById('editOfficerType').value = officer.officerType;
+                document.getElementById('editAppointmentDate').value = officer.appointmentDate.toISOString().split('T')[0];
+                document.getElementById('editTermYears').value = officer.termYears;
+                
+                // 定時総会開催目安の設定（定時総会終結時の場合のみ、未設定時はデフォルト3ヶ月）
+                if (termRule === 'general_meeting') {
+                    const gracePeriodSelect = document.getElementById('editGracePeriodMonths');
+                    if (gracePeriodSelect) {
+                        gracePeriodSelect.value = officer.gracePeriodMonths || 3;
+                    }
+                }
+
+                // モーダルを表示
+                document.getElementById('editModal').style.display = 'block';
+            }
+
+            updateOfficer() {
+                if (!this.currentEditId) return;
+
+                const officerIndex = this.officers.findIndex(o => o.id === this.currentEditId);
+                if (officerIndex === -1) return;
+
+                const corporationType = document.getElementById('editCorporationType').value;
+                const companyName = document.getElementById('editCompanyName').value;
+                const fiscalMonth = parseInt(document.getElementById('editFiscalMonth').value);
+                const officerType = document.getElementById('editOfficerType').value;
+                const appointmentDate = document.getElementById('editAppointmentDate').value;
+                const termYears = parseInt(document.getElementById('editTermYears').value);
+                
+                // 定時総会開催目安の取得（定時総会終結時のみ、デフォルト3ヶ月）
+                let gracePeriodMonths = 3;
+                if (corporationType === 'general_meeting') {
+                    const gracePeriodSelect = document.getElementById('editGracePeriodMonths');
+                    gracePeriodMonths = gracePeriodSelect ? parseInt(gracePeriodSelect.value) || 3 : 3;
+                }
+
+                this.officers[officerIndex] = {
+                    ...this.officers[officerIndex],
+                    termRule: corporationType,
+                    gracePeriodMonths: gracePeriodMonths,
+                    companyName,
+                    fiscalMonth,
+                    officerType,
+                    appointmentDate: new Date(appointmentDate),
+                    termYears,
+                    expiryDate: this.calculateExpiryDate(new Date(appointmentDate), fiscalMonth, termYears, corporationType, gracePeriodMonths)
+                };
+
+                this.saveData();
+                this.renderOfficerList();
+                this.renderMonthlyView();
+                this.updateStats();
+                this.checkNotifications();
+                this.closeEditModal();
+
+                alert('役員情報を更新しました。\n\n※ 実際の任期期間は定款等をご確認ください。\n本システムは任期満了予定日の目安を提供します。');
+            }
+
+            closeEditModal() {
+                document.getElementById('editModal').style.display = 'none';
+                this.currentEditId = null;
+            }
+
+            calculateExpiryDate(appointmentDate, fiscalMonth, termYears, termRule = 'general_meeting', gracePeriodMonths = 3) {
+                if (termRule === 'fixed_years') {
+                    // 【固定年数】就任日 + 任期年数 = 任期満了日（シンプル計算）
+                    const expiryDate = new Date(appointmentDate);
+                    expiryDate.setFullYear(appointmentDate.getFullYear() + termYears);
+                    return expiryDate;
+                } else {
+                    // 【定時総会終結時】事業年度に基づく任期計算
+                    // 「その選任後◯年以内に終了する事業年度に関する定時株主総会の終結の時まで」
+                    
+                    // 1. 満了応答日A = 就任日 + 任期年数
+                    const A = new Date(appointmentDate);
+                    A.setFullYear(appointmentDate.getFullYear() + termYears);
+                    
+                    // 2. candidateFYEnd = A.year の事業年度末日
+                    const candidateFYEnd = new Date(A.getFullYear(), fiscalMonth - 1, this.getLastDayOfMonth(A.getFullYear(), fiscalMonth));
+                    
+                    let fiscalYearEnd;
+                    
+                    // 3. 正しい分岐ロジック（裕紀さんご指導）
+                    if (A < candidateFYEnd) {
+                        // A < candidateFYEnd の場合：前年度末を採用
+                        fiscalYearEnd = new Date(A.getFullYear() - 1, fiscalMonth - 1, this.getLastDayOfMonth(A.getFullYear() - 1, fiscalMonth));
+                    } else {
+                        // A >= candidateFYEnd の場合：当年度末を採用
+                        fiscalYearEnd = candidateFYEnd;
+                    }
+                    
+                    // 4. 任期満了日 = fiscalYearEnd + 定時株主総会までの猶予月数の月末日
+                    let expiryMonth = fiscalMonth + gracePeriodMonths;
+                    let expiryYear = fiscalYearEnd.getFullYear();
+                    
+                    if (expiryMonth > 12) {
+                        expiryMonth -= 12;
+                        expiryYear += 1;
+                    }
+                    
+                    const lastDayOfMonth = this.getLastDayOfMonth(expiryYear, expiryMonth);
+                    
+                    return new Date(expiryYear, expiryMonth - 1, lastDayOfMonth);
+                }
+            }
+
+            deleteOfficer(id) {
+                const officer = this.officers.find(o => o.id === id);
+                if (!officer) return;
+                
+                const deleteConfirm = confirm(`この役員情報を削除しますか？\n\n【${officer.companyName}】\n${officer.officerType} (${officer.termYears}年任期)\n満了予定日: ${this.toJapaneseDate(officer.expiryDate)}`);
+                
+                if (deleteConfirm) {
+                    // 次回任期の自動生成確認
+                    const nextTermConfirm = confirm('削除後、同じ役員の次回任期を自動で登録しますか？\n\n「OK」: 次回任期を自動生成\n「キャンセル」: 完全削除のみ');
+                    
+                    if (nextTermConfirm) {
+                        // 次回任期の自動計算・生成
+                        const nextAppointmentDate = new Date(officer.expiryDate);
+                        // 満了日の翌日を次回就任日とする
+                        nextAppointmentDate.setDate(nextAppointmentDate.getDate() + 1);
+                        
+                        const nextOfficer = {
+                            id: Date.now() + 1, // 重複回避
+                            termRule: officer.termRule, // 同じ法人類型
+                            gracePeriodMonths: officer.gracePeriodMonths || 3, // 同じ猶予月数
+                            companyName: officer.companyName,
+                            fiscalMonth: officer.fiscalMonth,
+                            officerType: officer.officerType,
+                            appointmentDate: nextAppointmentDate,
+                            termYears: officer.termYears, // 同じ任期年数
+                            expiryDate: this.calculateExpiryDate(nextAppointmentDate, officer.fiscalMonth, officer.termYears, officer.termRule, officer.gracePeriodMonths || 3),
+                            createdAt: new Date(),
+                            isNextTerm: true // 次回任期フラグ
+                        };
+                        
+                        // 元データを削除し、次回任期データを追加
+                        this.officers = this.officers.filter(o => o.id !== id);
+                        this.officers.push(nextOfficer);
+                        
+                        alert(`役員情報を削除し、次回任期を自動生成しました。\n\n次回任期満了予定日: ${this.toJapaneseDate(nextOfficer.expiryDate)}`);
+                    } else {
+                        // 完全削除のみ
+                        this.officers = this.officers.filter(o => o.id !== id);
+                        alert('役員情報を完全削除しました。');
+                    }
+                    
+                    // UI更新
+                    this.saveData();
+                    this.renderOfficerList();
+                    this.renderMonthlyView();
+                    this.updateStats();
+                    this.checkNotifications();
+                }
+            }
+
+            renderOfficerList() {
+                const listElement = document.getElementById('officerList');
+                const today = new Date();
+                const past1y = new Date(today);
+                past1y.setFullYear(past1y.getFullYear() - 1);
+                const future1y = new Date(today);
+                future1y.setFullYear(future1y.getFullYear() + 1);
+                
+                // 満了日ベースでフィルタリング（直近±1年の満了対象）
+                const relevantOfficers = this.officers.filter(officer => {
+                    const expiryDate = new Date(officer.expiryDate);
+                    return expiryDate >= past1y && expiryDate <= future1y;
+                });
+                
+                if (relevantOfficers.length === 0) {
+                    listElement.innerHTML = '<p>直近±1年の満了対象はありません。</p>';
+                    return;
+                }
+                
+                // 満了済み（過去1年以内）と今後1年以内に分割
+                const expiredList = relevantOfficers.filter(officer => {
+                    const expiryDate = new Date(officer.expiryDate);
+                    return expiryDate < today;
+                }).sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate));
+                
+                const upcomingList = relevantOfficers.filter(officer => {
+                    const expiryDate = new Date(officer.expiryDate);
+                    return expiryDate >= today;
+                }).sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate));
+                
+                // HTML生成
+                let html = '';
+                
+                // 今後1年以内に満了予定ブロック
+                if (upcomingList.length > 0) {
+                    html += `
+                        <div class="expiry-block upcoming-block">
+                            <h4 class="block-title">📅 今後1年以内に満了予定（${upcomingList.length}件）</h4>
+                            <div class="officer-items">
+                    `;
+                    
+                    upcomingList.forEach(officer => {
+                        const expiryDate = new Date(officer.expiryDate);
+                        const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+                        
+                        let expiryClass = 'expiry-normal';
+                        let expiryText = `満了: ${this.toJapaneseDate(expiryDate)}`;
+                        
+                        if (daysUntilExpiry <= 30) {
+                            expiryClass = 'expiry-critical';
+                            expiryText = `⚠️ 満了まで${daysUntilExpiry}日`;
+                        } else if (daysUntilExpiry <= 90) {
+                            expiryClass = 'expiry-soon';
+                            expiryText = `満了まで${daysUntilExpiry}日`;
+                        }
+                        
+                        html += `
+                            <div class="officer-item">
+                                <div class="officer-info">
+                                    <strong>${officer.companyName}${officer.isNextTerm ? ' 🔄' : ''}</strong>
+                                    ${officer.isNextTerm ? '<span class="next-term-badge">次回任期</span>' : ''}
+                                    <div class="officer-details">
+                                        ${officer.officerType} | 就任: ${this.toJapaneseDate(officer.appointmentDate)} | 
+                                        任期: ${officer.termYears}年 | 事業年度末: ${officer.fiscalMonth}月（末日）
+                                    </div>
+                                </div>
+                                <div class="expiry-date ${expiryClass}">
+                                    ${expiryText}
+                                </div>
+                                <div class="action-buttons">
+                                    <button class="edit-btn" onclick="officerManager.editOfficer(${officer.id})">編集</button>
+                                    <button class="delete-btn" onclick="officerManager.deleteOfficer(${officer.id})">削除</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // 過去1年以内に満了済みブロック
+                if (expiredList.length > 0) {
+                    html += `
+                        <div class="expiry-block expired-block">
+                            <h4 class="block-title">✅ 過去1年以内に満了済み（${expiredList.length}件）</h4>
+                            <div class="officer-items">
+                    `;
+                    
+                    expiredList.forEach(officer => {
+                        const expiryDate = new Date(officer.expiryDate);
+                        const daysSinceExpiry = Math.floor((today - expiryDate) / (1000 * 60 * 60 * 24));
+                        
+                        html += `
+                            <div class="officer-item expired-item">
+                                <div class="officer-info">
+                                    <strong>${officer.companyName}${officer.isNextTerm ? ' 🔄' : ''}</strong>
+                                    ${officer.isNextTerm ? '<span class="next-term-badge">次回任期</span>' : ''}
+                                    <div class="officer-details">
+                                        ${officer.officerType} | 就任: ${this.toJapaneseDate(officer.appointmentDate)} | 
+                                        任期: ${officer.termYears}年 | 事業年度末: ${officer.fiscalMonth}月（末日）
+                                    </div>
+                                </div>
+                                <div class="expiry-date expiry-expired">
+                                    満了済み: ${this.toJapaneseDate(expiryDate)} （${daysSinceExpiry}日経過）
+                                </div>
+                                <div class="action-buttons">
+                                    <button class="edit-btn" onclick="officerManager.editOfficer(${officer.id})">編集</button>
+                                    <button class="delete-btn" onclick="officerManager.deleteOfficer(${officer.id})">削除</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                listElement.innerHTML = html;
+            }
+
+            renderMonthlyView() {
+                const monthlyElement = document.getElementById('monthlyView');
+                const monthlyData = {};
+                
+                // 月別にグループ化（データ側から存在する年月のみ）
+                this.officers.forEach(officer => {
+                    const expiryDate = new Date(officer.expiryDate);
+                    const monthKey = `${expiryDate.getFullYear()}-${String(expiryDate.getMonth() + 1).padStart(2, '0')}`;
+                    
+                    if (!monthlyData[monthKey]) {
+                        monthlyData[monthKey] = [];
+                    }
+                    monthlyData[monthKey].push(officer);
+                });
+                
+                // 満了予定がある年月のみ抽出してソート
+                const existingMonths = Object.keys(monthlyData)
+                    .sort() // YYYY-MM 形式なので文字列ソートで正しく並ぶ
+                    .map(monthKey => {
+                        const [year, month] = monthKey.split('-');
+                        return {
+                            key: monthKey,
+                            year: parseInt(year),
+                            month: parseInt(month),
+                            display: `${year}年${month}月`,
+                            officers: monthlyData[monthKey]
+                        };
+                    });
+                
+                if (existingMonths.length === 0) {
+                    monthlyElement.innerHTML = '<p>満了予定のデータがありません。</p>';
+                    return;
+                }
+                
+                // 年別にグループ化
+                const yearGroups = {};
+                existingMonths.forEach(monthData => {
+                    const year = monthData.year;
+                    if (!yearGroups[year]) {
+                        yearGroups[year] = [];
+                    }
+                    yearGroups[year].push(monthData);
+                });
+                
+                // HTML生成（年フレーム別）
+                let html = '';
+                
+                Object.keys(yearGroups)
+                    .sort((a, b) => parseInt(a) - parseInt(b)) // 年昇順
+                    .forEach(year => {
+                        const yearData = yearGroups[year];
+                        const totalCount = yearData.reduce((sum, month) => sum + month.officers.length, 0);
+                        
+                        html += `
+                            <div class="year-frame">
+                                <div class="year-title">${year}年（合計${totalCount}件）</div>
+                                <div class="month-grid">
+                        `;
+                        
+                        yearData.forEach(monthData => {
+                            html += `
+                                <div class="month-card">
+                                    <div class="month-header">
+                                        ${monthData.month}月 (${monthData.officers.length}件)
+                                    </div>
+                                    <div class="month-content">
+                                        ${monthData.officers.map(officer => `
+                                            <div class="company-expiry">
+                                                <div class="company-info">
+                                                    <strong>${officer.companyName}${officer.isNextTerm ? ' 🔄' : ''}</strong>
+                                                    ${officer.isNextTerm ? '<br><span class="next-term-badge">次回任期</span>' : ''}
+                                                    <br>${officer.officerType} (${officer.termYears}年任期)<br>
+                                                    満了日: ${this.toJapaneseDate(officer.expiryDate)}
+                                                </div>
+                                                <div class="month-actions">
+                                                    <button class="edit-btn" onclick="officerManager.editFromMonthly(${officer.id})">編集</button>
+                                                    <button class="delete-btn" onclick="officerManager.deleteOfficer(${officer.id})">削除</button>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        html += `
+                                </div>
+                            </div>
+                        `;
+                    });
+                
+                monthlyElement.innerHTML = html;
+            }
+
+            updateStats() {
+                const totalCompanies = new Set(this.officers.map(o => o.companyName)).size;
+                const totalOfficers = this.officers.length;
+                const today = new Date();
+                const threeMonthsLater = new Date(today.getTime() + 90 * 24 * 60 * 60 * 1000);
+                
+                const expiringSoon = this.officers.filter(officer => {
+                    const expiryDate = new Date(officer.expiryDate);
+                    return expiryDate >= today && expiryDate <= threeMonthsLater;
+                }).length;
+                
+                const expired = this.officers.filter(officer => {
+                    const expiryDate = new Date(officer.expiryDate);
+                    return expiryDate < today;
+                }).length;
+
+                document.getElementById('totalCompanies').textContent = totalCompanies;
+                document.getElementById('totalOfficers').textContent = totalOfficers;
+                document.getElementById('expiringSoon').textContent = expiringSoon;
+                document.getElementById('expired').textContent = expired;
+            }
+
+            checkNotifications() {
+                const today = new Date();
+                const currentMonth = today.getMonth() + 1;
+                const currentYear = today.getFullYear();
+                
+                // 今月満了の役員を取得
+                const thisMonthExpiring = this.officers.filter(officer => {
+                    const expiryDate = new Date(officer.expiryDate);
+                    return expiryDate.getMonth() + 1 === currentMonth && 
+                           expiryDate.getFullYear() === currentYear;
+                });
+
+                if (thisMonthExpiring.length > 0) {
+                    this.showNotification(thisMonthExpiring);
+                } else {
+                    document.getElementById('notificationPanel').style.display = 'none';
+                }
+            }
+
+            showNotification(officers) {
+                const panel = document.getElementById('notificationPanel');
+                const content = document.getElementById('notificationContent');
+                
+                content.innerHTML = officers.map(officer => `
+                    <div class="notification-item">
+                        📅 ${officer.companyName} - ${officer.officerType} 
+                        (満了日: ${this.toJapaneseDate(officer.expiryDate)})
+                    </div>
+                `).join('');
+                
+                panel.style.display = 'block';
+                
+                // ブラウザ通知の送信（権限がある場合）
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification('役員任期満了通知', {
+                        body: `${officers.length}件の役員任期が今月満了予定です。`,
+                        icon: '📅'
+                    });
+                }
+            }
+
+            exportData() {
+                const csvData = [
+                    ['会社名', '役員種別', '就任日', '任期年数', '事業年度末月', '猶予月数', '満了予定日'],
+                    ...this.officers.map(officer => [
+                        officer.companyName,
+                        officer.officerType,
+                        this.toJapaneseDate(officer.appointmentDate),
+                        officer.termYears + '年',
+                        officer.fiscalMonth + '月（末日）',
+                        officer.termRule === 'general_meeting' ? (officer.gracePeriodMonths || 3) + 'ヶ月' : 'N/A',
+                        this.toJapaneseDate(officer.expiryDate)
+                    ])
+                ];
+
+                const csvContent = csvData.map(row => 
+                    row.map(field => `"${field}"`).join(',')
+                ).join('\n');
+
+                const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `役員任期管理_${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+            }
+
+            // CSVインポート機能
+            importData(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                if (!file.name.endsWith('.csv')) {
+                    alert('CSVファイルを選択してください。');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const text = e.target.result;
+                        const rows = this.parseCSV(text);
+                        
+                        if (rows.length === 0) {
+                            alert('CSVファイルが空です。');
+                            return;
+                        }
+
+                        // ヘッダー行をチェック
+                        const header = rows[0];
+                        const expectedHeaders = ['会社名', '役員種別', '就任日', '任期年数', '事業年度末月'];
+                        
+                        const validHeaders = expectedHeaders.every(h => 
+                            header.some(col => col.includes(h) || h.includes(col.replace(/"/g, '').trim()))
+                        );
+
+                        if (!validHeaders) {
+                            if (confirm('CSVのヘッダーが想定と異なります。それでもインポートを続けますか？\n\n期待されるヘッダー: ' + expectedHeaders.join(', '))) {
+                                // ヘッダーなしとして処理
+                            } else {
+                                return;
+                            }
+                        }
+
+                        // データ行の処理（ヘッダー行をスキップ）
+                        const dataRows = validHeaders ? rows.slice(1) : rows;
+                        const importedOfficers = [];
+                        const errors = [];
+
+                        dataRows.forEach((row, index) => {
+                            try {
+                                const officer = this.parseOfficerFromCSV(row, index + (validHeaders ? 2 : 1));
+                                if (officer) {
+                                    importedOfficers.push(officer);
+                                }
+                            } catch (error) {
+                                errors.push(`行${index + (validHeaders ? 2 : 1)}: ${error.message}`);
+                            }
+                        });
+
+                        if (errors.length > 0) {
+                            const continueImport = confirm(`${errors.length}件のエラーがあります:\n\n${errors.slice(0, 5).join('\n')}${errors.length > 5 ? '\n...(他' + (errors.length - 5) + '件)' : ''}\n\n正常なデータのみインポートしますか？`);
+                            if (!continueImport) {
+                                return;
+                            }
+                        }
+
+                        if (importedOfficers.length === 0) {
+                            alert('インポート可能なデータがありませんでした。');
+                            return;
+                        }
+
+                        // 既存データとの重複チェック
+                        const duplicateCount = importedOfficers.filter(newOfficer => 
+                            this.officers.some(existingOfficer => 
+                                existingOfficer.companyName === newOfficer.companyName &&
+                                existingOfficer.officerType === newOfficer.officerType &&
+                                new Date(existingOfficer.appointmentDate).getTime() === new Date(newOfficer.appointmentDate).getTime()
+                            )
+                        ).length;
+
+                        let confirmMessage = `${importedOfficers.length}件のデータをインポートします。`;
+                        if (duplicateCount > 0) {
+                            confirmMessage += `\n（${duplicateCount}件の重複データが含まれます）`;
+                        }
+                        if (errors.length > 0) {
+                            confirmMessage += `\n（${errors.length}件のエラーデータは除外されます）`;
+                        }
+
+                        if (confirm(confirmMessage + '\n\n続行しますか？')) {
+                            this.officers.push(...importedOfficers);
+                            this.saveData();
+                            this.renderOfficerList();
+                            this.renderMonthlyView();
+                            this.updateStats();
+                            this.checkNotifications();
+
+                            alert(`${importedOfficers.length}件のデータをインポートしました。` + 
+                                  (errors.length > 0 ? `\n${errors.length}件のエラーデータは除外されました。` : ''));
+                        }
+
+                    } catch (error) {
+                        alert('CSVファイルの読み込みに失敗しました。\nファイル形式を確認してください。\n\nエラー: ' + error.message);
+                    }
+
+                    // ファイル入力をリセット
+                    event.target.value = '';
+                };
+
+                reader.readAsText(file, 'UTF-8');
+            }
+
+            // CSV解析機能
+            parseCSV(text) {
+                const lines = text.split('\n').filter(line => line.trim());
+                return lines.map(line => {
+                    const columns = [];
+                    let current = '';
+                    let inQuotes = false;
+                    
+                    for (let i = 0; i < line.length; i++) {
+                        const char = line[i];
+                        
+                        if (char === '"') {
+                            if (inQuotes && line[i + 1] === '"') {
+                                current += '"';
+                                i++; // Skip next quote
+                            } else {
+                                inQuotes = !inQuotes;
+                            }
+                        } else if (char === ',' && !inQuotes) {
+                            columns.push(current.trim());
+                            current = '';
+                        } else {
+                            current += char;
+                        }
+                    }
+                    columns.push(current.trim());
+                    
+                    return columns.map(col => col.replace(/^"|"$/g, ''));
+                });
+            }
+
+            // CSV行から役員オブジェクトを作成
+            parseOfficerFromCSV(row, rowNumber) {
+                if (row.length < 5) {
+                    throw new Error(`データが不足しています（${row.length}列）`);
+                }
+
+                const [companyName, officerType, appointmentDateStr, termYearsStr, fiscalMonthStr] = row;
+
+                // 必須フィールドのチェック
+                if (!companyName || !officerType || !appointmentDateStr || !termYearsStr || !fiscalMonthStr) {
+                    throw new Error('必須項目が入力されていません');
+                }
+
+                // 就任日の解析（和暦・西暦両対応）
+                let appointmentDate;
+                try {
+                    appointmentDate = this.parseJapaneseDate(appointmentDateStr);
+                    if (!appointmentDate) {
+                        // 西暦での解析を試行
+                        appointmentDate = new Date(appointmentDateStr.replace(/年|月|日/g, match => 
+                            match === '年' ? '-' : match === '月' ? '-' : ''
+                        ));
+                    }
+                    if (isNaN(appointmentDate.getTime())) {
+                        throw new Error('日付形式が無効です');
+                    }
+                } catch (e) {
+                    throw new Error(`就任日の解析に失敗: ${appointmentDateStr}`);
+                }
+
+                // 任期年数の解析
+                const termYears = parseInt(termYearsStr.replace(/年/g, ''));
+                if (isNaN(termYears) || termYears < 1 || termYears > 10) {
+                    throw new Error(`任期年数が無効です: ${termYearsStr}`);
+                }
+
+                // 事業年度末月の解析
+                const fiscalMonth = parseInt(fiscalMonthStr.replace(/月/g, ''));
+                if (isNaN(fiscalMonth) || fiscalMonth < 1 || fiscalMonth > 12) {
+                    throw new Error(`事業年度末月が無効です: ${fiscalMonthStr}`);
+                }
+
+                // 役員種別のチェック
+                if (!['取締役', '監査役'].includes(officerType)) {
+                    throw new Error(`役員種別が無効です: ${officerType}`);
+                }
+
+                return {
+                    id: Date.now() + Math.random(), // 重複を避けるためランダム要素を追加
+                    termRule: 'general_meeting', // CSVインポート時はデフォルトで定時総会終結時
+                    gracePeriodMonths: 3, // CSVインポート時はデフォルト3ヶ月
+                    companyName: companyName.trim(),
+                    fiscalMonth,
+                    officerType: officerType.trim(),
+                    appointmentDate,
+                    termYears,
+                    expiryDate: this.calculateExpiryDate(appointmentDate, fiscalMonth, termYears, 'general_meeting', 3),
+                    createdAt: new Date()
+                };
+            }
+
+            // 和暦文字列を日付オブジェクトに変換
+            parseJapaneseDate(dateStr) {
+                const patterns = [
+                    { regex: /令和(\d+)年(\d+)月(\d+)日/, baseYear: 2018 },
+                    { regex: /平成(\d+)年(\d+)月(\d+)日/, baseYear: 1988 },
+                    { regex: /昭和(\d+)年(\d+)月(\d+)日/, baseYear: 1925 }
+                ];
+
+                for (const pattern of patterns) {
+                    const match = dateStr.match(pattern.regex);
+                    if (match) {
+                        const [, eraYear, month, day] = match;
+                        const year = pattern.baseYear + parseInt(eraYear);
+                        return new Date(year, parseInt(month) - 1, parseInt(day));
+                    }
+                }
+
+                return null;
+            }
+
+            saveData() {
+                localStorage.setItem('officers', JSON.stringify(this.officers));
+            }
         }
+
+        // アプリケーション初期化
+        const officerManager = new OfficerManager();
+
+        // ブラウザ通知の許可リクエスト
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
+        // Service Worker 登録 (PWA対応)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('./sw.js');
+                    console.log('[PWA] Service Worker 登録成功:', registration.scope);
+                    
+                    // 更新チェック
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        console.log('[PWA] Service Worker 更新検出');
+                        
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('[PWA] 新しいコンテンツが利用可能です');
+                                // 必要に応じてユーザーに更新を通知
+                                if (confirm('アプリの新しいバージョンが利用可能です。更新しますか？')) {
+                                    window.location.reload();
+                                }
+                            }
+                        });
+                    });
+                    
+                } catch (error) {
+                    console.error('[PWA] Service Worker 登録失敗:', error);
+                }
+            });
+        }
+
+        // PWA インストール促進
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // インストールボタンを表示（必要に応じて）
+            console.log('[PWA] アプリインストール可能');
+            
+            // 3秒後にインストール促進メッセージを表示
+            setTimeout(() => {
+                if (confirm('このアプリをスマートフォンのホーム画面に追加しますか？より便利に利用できます。')) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('[PWA] ユーザーがインストールを承認');
+                        }
+                        deferredPrompt = null;
+                    });
+                }
+            }, 3000);
+        });
+
+        // アプリがインストールされた時
+        window.addEventListener('appinstalled', (e) => {
+            console.log('[PWA] アプリがインストールされました');
+            // インストール完了の通知
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('Ninky', {
+                    body: 'アプリがインストールされました。ホーム画面からアクセスできます。',
+                    icon: './ninky-icon-180.png'
+                });
+            }
+        });
     </script>
 </body>
 </html>
