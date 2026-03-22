@@ -1350,11 +1350,11 @@ const relevantOfficers = this.officers.filter(officer => {
                 // HTML生成
                 let html = '';
                 
-                // 今後1年以内に満了予定ブロック
+                // 直近の満了予定ブロック
                 if (upcomingList.length > 0) {
                     html += `
                         <div class="expiry-block upcoming-block">
-                            <h4 class="block-title">📅 今後1年以内に満了予定（${upcomingList.length}件）</h4>
+                            <h4 class="block-title">📅 直近の満了予定（${upcomingList.length}件）</h4>
                             <div class="officer-items">
                     `;
                     
@@ -1400,11 +1400,11 @@ const relevantOfficers = this.officers.filter(officer => {
                     `;
                 }
                 
-                // 過去1年以内に満了済みブロック
+                // 満了済みブロック
                 if (expiredList.length > 0) {
                     html += `
                         <div class="expiry-block expired-block">
-                            <h4 class="block-title">✅ 過去1年以内に満了済み（${expiredList.length}件）</h4>
+                            <h4 class="block-title">✅ 満了済み（${expiredList.length}件）</h4>
                             <div class="officer-items">
                     `;
                     
