@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ninky-v2.2.1';
+const CACHE_NAME = 'ninky-v2.3.0';
 const STATIC_CACHE_URLS = [
   './index.html',
   './ninky-manifest.json',

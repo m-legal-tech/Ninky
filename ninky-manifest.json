@@ -2,7 +2,7 @@
   "name": "Ninky",
   "short_name": "Ninky",
   "description": "任期管理を自動化！プロのための役員管理プラットフォーム。",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#667eea",

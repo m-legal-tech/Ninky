@@ -535,6 +535,327 @@
                 font-size: 16px;
             }
         }
+
+        /* ========================================
+           v2.3.0: ユーザー設定 + 通知メッセージ機能
+           ======================================== */
+
+        /* ── ヘッダー右上の⚙️ボタン ── */
+        .header-actions {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          display: flex;
+          gap: 8px;
+        }
+        .header { position: relative; }
+        .settings-btn {
+          background: rgba(255,255,255,0.2);
+          color: white;
+          border: 2px solid rgba(255,255,255,0.4);
+          padding: 8px 14px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 1rem;
+          font-weight: bold;
+          transition: all 0.2s;
+          backdrop-filter: blur(4px);
+        }
+        .settings-btn:hover {
+          background: rgba(255,255,255,0.35);
+          transform: none;
+          box-shadow: none;
+        }
+
+        /* ── 設定パネルモーダル ── */
+        .settings-modal {
+          display: none;
+          position: fixed;
+          z-index: 3000;
+          left: 0; top: 0;
+          width: 100%; height: 100%;
+          background: rgba(0,0,0,0.5);
+          overflow-y: auto;
+        }
+        .settings-modal-content {
+          background: white;
+          margin: 40px auto;
+          padding: 32px;
+          border-radius: 12px;
+          width: 90%;
+          max-width: 560px;
+          position: relative;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        .settings-modal-content h2 {
+          color: #667eea;
+          border-bottom: 2px solid #667eea;
+          padding-bottom: 10px;
+          margin-bottom: 24px;
+          font-size: 1.3rem;
+        }
+        .settings-form-group {
+          margin-bottom: 16px;
+        }
+        .settings-form-group label {
+          display: block;
+          font-weight: bold;
+          font-size: 0.88rem;
+          color: #555;
+          margin-bottom: 5px;
+        }
+        .settings-form-group label .required {
+          color: #f44336;
+          margin-left: 4px;
+          font-size: 0.8rem;
+        }
+        .settings-form-group label .optional {
+          color: #999;
+          font-size: 0.75rem;
+          font-weight: normal;
+          margin-left: 6px;
+        }
+        .settings-form-group input,
+        .settings-form-group textarea {
+          width: 100%;
+          padding: 10px 12px;
+          border: 2px solid #ddd;
+          border-radius: 6px;
+          font-size: 0.95rem;
+          font-family: inherit;
+          transition: border-color 0.2s;
+          box-sizing: border-box;
+        }
+        .settings-form-group input:focus,
+        .settings-form-group textarea:focus {
+          outline: none;
+          border-color: #667eea;
+        }
+        .settings-form-group textarea {
+          min-height: 80px;
+          resize: vertical;
+          line-height: 1.6;
+        }
+        .settings-actions {
+          display: flex;
+          gap: 10px;
+          margin-top: 24px;
+          flex-wrap: wrap;
+        }
+        .settings-save-btn {
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white;
+          padding: 11px 24px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: bold;
+          font-size: 0.95rem;
+          transition: all 0.2s;
+        }
+        .settings-save-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102,126,234,0.4); }
+        .settings-cancel-btn {
+          background: #f8f9fa;
+          color: #555;
+          padding: 11px 20px;
+          border: 2px solid #ddd;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: bold;
+          font-size: 0.95rem;
+        }
+        .settings-section-title {
+          font-size: 0.8rem;
+          font-weight: bold;
+          color: #999;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          margin: 20px 0 12px;
+          padding-bottom: 6px;
+          border-bottom: 1px solid #eee;
+        }
+        .settings-profile-banner {
+          background: linear-gradient(135deg, #e8f0fe, #f3e8ff);
+          border: 1px solid #c5b8f8;
+          border-radius: 8px;
+          padding: 12px 16px;
+          margin-bottom: 20px;
+          font-size: 0.9rem;
+          color: #4a3a8a;
+        }
+        .settings-saved-toast {
+          display: none;
+          background: #28a745;
+          color: white;
+          padding: 10px 20px;
+          border-radius: 6px;
+          font-weight: bold;
+          font-size: 0.9rem;
+          margin-top: 10px;
+          text-align: center;
+        }
+
+        /* ── 通知メッセージモーダル ── */
+        .msg-modal {
+          display: none;
+          position: fixed;
+          z-index: 2000;
+          left: 0; top: 0;
+          width: 100%; height: 100%;
+          background: rgba(0,0,0,0.55);
+          overflow-y: auto;
+        }
+        .msg-modal-content {
+          background: white;
+          margin: 40px auto;
+          padding: 30px;
+          border-radius: 12px;
+          width: 90%;
+          max-width: 640px;
+          position: relative;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        .msg-modal-content h2 {
+          font-size: 1.25rem;
+          color: #667eea;
+          border-bottom: 2px solid #667eea;
+          padding-bottom: 8px;
+          margin-bottom: 18px;
+        }
+        .msg-tabs {
+          display: flex;
+          gap: 8px;
+          margin-bottom: 14px;
+        }
+        .msg-tab {
+          flex: 1;
+          padding: 10px;
+          border: 2px solid #ddd;
+          border-radius: 6px;
+          background: #f8f9fa;
+          cursor: pointer;
+          font-weight: bold;
+          font-size: 0.92rem;
+          transition: all 0.2s;
+        }
+        .msg-tab.active {
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white;
+          border-color: transparent;
+        }
+        .msg-panel { display: none; }
+        .msg-panel.active { display: block; }
+        .msg-textarea {
+          width: 100%;
+          min-height: 260px;
+          padding: 14px;
+          border: 2px solid #ddd;
+          border-radius: 6px;
+          font-size: 0.9rem;
+          line-height: 1.75;
+          font-family: inherit;
+          resize: vertical;
+          box-sizing: border-box;
+        }
+        .msg-textarea:focus { outline: none; border-color: #667eea; }
+        .msg-meta {
+          background: #f8f9ff;
+          border: 1px solid #e0e4ff;
+          border-radius: 6px;
+          padding: 10px 14px;
+          margin-bottom: 14px;
+          font-size: 0.88rem;
+          color: #555;
+          line-height: 1.5;
+        }
+        .msg-meta strong { color: #333; }
+        .msg-actions {
+          display: flex;
+          gap: 10px;
+          margin-top: 12px;
+          flex-wrap: wrap;
+        }
+        .msg-copy-btn {
+          background: linear-gradient(135deg, #28a745, #20c997);
+          color: white;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: bold;
+          font-size: 0.92rem;
+          transition: all 0.2s;
+        }
+        .msg-copy-btn:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(40,167,69,0.35); }
+        .msg-copy-btn.copied { background: linear-gradient(135deg, #6c757d, #495057); }
+        .msg-close-btn {
+          background: #f8f9fa;
+          color: #555;
+          padding: 10px 20px;
+          border: 2px solid #ddd;
+          border-radius: 6px;
+          cursor: pointer;
+          font-weight: bold;
+          font-size: 0.92rem;
+        }
+        .msg-email-subject-wrap { margin-bottom: 10px; }
+        .msg-email-subject-wrap label {
+          display: block;
+          font-weight: bold;
+          font-size: 0.85rem;
+          color: #555;
+          margin-bottom: 4px;
+        }
+        .msg-email-subject-input {
+          width: 100%;
+          padding: 9px 12px;
+          border: 2px solid #ddd;
+          border-radius: 6px;
+          font-size: 0.92rem;
+          box-sizing: border-box;
+        }
+        .msg-email-subject-input:focus { outline: none; border-color: #667eea; }
+
+        /* ── 通知文ボタン ── */
+        .notify-btn {
+          background: linear-gradient(135deg, #ff9800, #ffc107);
+          color: white;
+          border: none;
+          padding: 4px 9px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 11.5px;
+          font-weight: bold;
+          transition: all 0.2s;
+          white-space: nowrap;
+        }
+        .notify-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(255,152,0,0.4); }
+
+        /* ── 未設定バナー ── */
+        .profile-unset-banner {
+          background: #fff3e0;
+          border: 1px solid #ffcc02;
+          border-radius: 8px;
+          padding: 12px 16px;
+          margin-bottom: 16px;
+          font-size: 0.9rem;
+          color: #7a4f00;
+          display: none;
+        }
+        .profile-unset-banner a {
+          color: #667eea;
+          cursor: pointer;
+          font-weight: bold;
+          text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+          .header-actions { top: 12px; right: 12px; }
+          .settings-modal-content,
+          .msg-modal-content { margin: 16px auto; padding: 20px; }
+          .msg-tabs { flex-direction: column; }
+          .settings-actions { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
@@ -542,6 +863,12 @@
         <div class="header">
             <h1>Ninky</h1>
             <p>任期管理を自動化！プロのための役員管理プラットフォーム。</p>
+            <!-- ヘッダー右上の設定ボタン -->
+            <div class="header-actions">
+                <button class="settings-btn" onclick="officerManager.openSettingsModal()" title="事務所設定">
+                    ⚙️ 設定
+                </button>
+            </div>
         </div>
 
         <!-- 通知パネル -->
@@ -748,6 +1075,100 @@
         </div>
     </div>
 
+    <!-- ⚙️ ユーザー設定モーダル -->
+    <div id="settingsModal" class="settings-modal">
+      <div class="settings-modal-content">
+        <span class="close" onclick="officerManager.closeSettingsModal()">&times;</span>
+        <h2>⚙️ 事務所・担当者設定</h2>
+        <div class="settings-profile-banner">
+          ここで登録した情報は、任期満了通知メッセージに自動で差し込まれます。
+          データはこのデバイスのローカルに保存されます。
+        </div>
+
+        <div class="settings-section-title">事務所情報</div>
+        <div class="settings-form-group">
+          <label for="settingOfficeName">事務所名<span class="required">*必須</span></label>
+          <input type="text" id="settingOfficeName" placeholder="例：〇〇司法書士事務所">
+        </div>
+        <div class="settings-form-group">
+          <label for="settingOfficerName">担当者氏名<span class="required">*必須</span></label>
+          <input type="text" id="settingOfficerName" placeholder="例：山田 太郎">
+        </div>
+        <div class="settings-form-group">
+          <label for="settingTitle">肩書き<span class="optional">任意</span></label>
+          <input type="text" id="settingTitle" placeholder="例：司法書士・行政書士">
+        </div>
+
+        <div class="settings-section-title">連絡先</div>
+        <div class="settings-form-group">
+          <label for="settingTel">電話番号（固定）<span class="optional">任意</span></label>
+          <input type="tel" id="settingTel" placeholder="例：0845-22-5634">
+        </div>
+        <div class="settings-form-group">
+          <label for="settingMobile">携帯番号<span class="optional">任意</span></label>
+          <input type="tel" id="settingMobile" placeholder="例：090-0000-0000">
+        </div>
+        <div class="settings-form-group">
+          <label for="settingEmail">メールアドレス<span class="optional">任意</span></label>
+          <input type="email" id="settingEmail" placeholder="例：your@email.com">
+        </div>
+        <div class="settings-form-group">
+          <label for="settingLine">LINE URL<span class="optional">任意</span></label>
+          <input type="url" id="settingLine" placeholder="例：https://line.me/ti/p/xxxx">
+        </div>
+
+        <div class="settings-section-title">署名カスタマイズ</div>
+        <div class="settings-form-group">
+          <label for="settingAddress">住所<span class="optional">任意</span></label>
+          <input type="text" id="settingAddress" placeholder="例：〒000-0000 ○○県○○市○○町0番地0">
+        </div>
+        <div class="settings-form-group">
+          <label for="settingMsgNote">メッセージへの追記文<span class="optional">任意</span></label>
+          <textarea id="settingMsgNote" placeholder="例：ご不明な点はお気軽にご連絡ください。"></textarea>
+        </div>
+
+        <div class="settings-actions">
+          <button class="settings-save-btn" onclick="officerManager.saveSettings()">💾 保存</button>
+          <button class="settings-cancel-btn" onclick="officerManager.closeSettingsModal()">キャンセル</button>
+        </div>
+        <div id="settingsSavedToast" class="settings-saved-toast">✅ 設定を保存しました</div>
+      </div>
+    </div>
+
+    <!-- 📨 通知メッセージ作成モーダル -->
+    <div id="msgModal" class="msg-modal">
+      <div class="msg-modal-content">
+        <span class="close" onclick="officerManager.closeMsgModal()">&times;</span>
+        <h2>📨 任期満了 通知メッセージ作成</h2>
+        <div id="profileUnsetBanner" class="profile-unset-banner">
+          ⚠️ 事務所情報が未設定です。<a onclick="officerManager.closeMsgModal(); officerManager.openSettingsModal()">⚙️ 設定する</a>
+        </div>
+        <div class="msg-meta" id="msgMeta"></div>
+        <div class="msg-tabs">
+          <button class="msg-tab active" onclick="officerManager.switchMsgTab('line', this)">📱 LINE</button>
+          <button class="msg-tab" onclick="officerManager.switchMsgTab('email', this)">📧 メール</button>
+        </div>
+        <div id="msgPanelLine" class="msg-panel active">
+          <textarea id="msgTextLine" class="msg-textarea"></textarea>
+          <div class="msg-actions">
+            <button class="msg-copy-btn" id="copyBtnLine" onclick="officerManager.copyMsg('line')">📋 コピー</button>
+            <button class="msg-close-btn" onclick="officerManager.closeMsgModal()">閉じる</button>
+          </div>
+        </div>
+        <div id="msgPanelEmail" class="msg-panel">
+          <div class="msg-email-subject-wrap">
+            <label>件名</label>
+            <input type="text" id="msgEmailSubject" class="msg-email-subject-input">
+          </div>
+          <textarea id="msgTextEmail" class="msg-textarea"></textarea>
+          <div class="msg-actions">
+            <button class="msg-copy-btn" id="copyBtnEmail" onclick="officerManager.copyMsg('email')">📋 本文コピー</button>
+            <button class="msg-close-btn" onclick="officerManager.closeMsgModal()">閉じる</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
         class OfficerManager {
             constructor() {
@@ -902,6 +1323,13 @@
                 window.addEventListener('click', (e) => {
                     if (e.target === document.getElementById('editModal')) {
                         this.closeEditModal();
+                    }
+                    // v2.3.0: 設定・通知モーダルの背景クリックで閉じる
+                    if (e.target === document.getElementById('settingsModal')) {
+                        this.closeSettingsModal();
+                    }
+                    if (e.target === document.getElementById('msgModal')) {
+                        this.closeMsgModal();
                     }
                 });
             }
@@ -1389,6 +1817,7 @@ const relevantOfficers = this.officers.filter(officer => {
                                 <div class="action-buttons">
                                     <button class="edit-btn" onclick="officerManager.editOfficer(${officer.id})">編集</button>
                                     <button class="delete-btn" onclick="officerManager.deleteOfficer(${officer.id})">削除</button>
+                                    <button class="notify-btn" onclick="officerManager.openMsgModal('${officer.id}')">📨 通知文</button>
                                 </div>
                             </div>
                         `;
@@ -1428,6 +1857,7 @@ const relevantOfficers = this.officers.filter(officer => {
                                 <div class="action-buttons">
                                     <button class="edit-btn" onclick="officerManager.editOfficer(${officer.id})">編集</button>
                                     <button class="delete-btn" onclick="officerManager.deleteOfficer(${officer.id})">削除</button>
+                                    <button class="notify-btn" onclick="officerManager.openMsgModal('${officer.id}')">📨 通知文</button>
                                 </div>
                             </div>
                         `;
@@ -1519,6 +1949,7 @@ const relevantOfficers = this.officers.filter(officer => {
                                                 <div class="month-actions">
                                                     <button class="edit-btn" onclick="officerManager.editFromMonthly(${officer.id})">編集</button>
                                                     <button class="delete-btn" onclick="officerManager.deleteOfficer(${officer.id})">削除</button>
+                                                    <button class="notify-btn" onclick="officerManager.openMsgModal('${officer.id}')">📨 通知文</button>
                                                 </div>
                                             </div>
                                         `).join('')}
@@ -1843,6 +2274,222 @@ const relevantOfficers = this.officers.filter(officer => {
 
             saveData() {
                 localStorage.setItem('officers', JSON.stringify(this.officers));
+            }
+
+            // ============================================
+            //  v2.3.0: ユーザー設定 (localStorage: ninkyUserProfile)
+            // ============================================
+
+            loadProfile() {
+                return JSON.parse(localStorage.getItem('ninkyUserProfile')) || {};
+            }
+
+            saveSettings() {
+                const profile = {
+                    officeName:  document.getElementById('settingOfficeName').value.trim(),
+                    officerName: document.getElementById('settingOfficerName').value.trim(),
+                    title:       document.getElementById('settingTitle').value.trim(),
+                    tel:         document.getElementById('settingTel').value.trim(),
+                    mobile:      document.getElementById('settingMobile').value.trim(),
+                    email:       document.getElementById('settingEmail').value.trim(),
+                    line:        document.getElementById('settingLine').value.trim(),
+                    address:     document.getElementById('settingAddress').value.trim(),
+                    msgNote:     document.getElementById('settingMsgNote').value.trim(),
+                };
+
+                if (!profile.officeName || !profile.officerName) {
+                    alert('事務所名と担当者氏名は必須です。');
+                    return;
+                }
+
+                localStorage.setItem('ninkyUserProfile', JSON.stringify(profile));
+
+                const toast = document.getElementById('settingsSavedToast');
+                toast.style.display = 'block';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                    this.closeSettingsModal();
+                }, 1600);
+            }
+
+            openSettingsModal() {
+                const profile = this.loadProfile();
+                const fields = {
+                    settingOfficeName:  profile.officeName  || '',
+                    settingOfficerName: profile.officerName || '',
+                    settingTitle:       profile.title       || '',
+                    settingTel:         profile.tel         || '',
+                    settingMobile:      profile.mobile      || '',
+                    settingEmail:       profile.email       || '',
+                    settingLine:        profile.line        || '',
+                    settingAddress:     profile.address     || '',
+                    settingMsgNote:     profile.msgNote     || '',
+                };
+                Object.entries(fields).forEach(([id, val]) => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = val;
+                });
+                document.getElementById('settingsSavedToast').style.display = 'none';
+                document.getElementById('settingsModal').style.display = 'block';
+            }
+
+            closeSettingsModal() {
+                document.getElementById('settingsModal').style.display = 'none';
+            }
+
+            // ============================================
+            //  v2.3.0: 通知メッセージ生成
+            // ============================================
+
+            openMsgModal(officerId) {
+                const officer = this.officers.find(o => String(o.id) === String(officerId));
+                if (!officer) return;
+
+                const profile = this.loadProfile();
+                const isProfileSet = !!(profile.officeName && profile.officerName);
+
+                document.getElementById('profileUnsetBanner').style.display =
+                    isProfileSet ? 'none' : 'block';
+
+                const expiryDate = new Date(officer.expiryDate);
+                const expiryStr  = `${expiryDate.getFullYear()}年${expiryDate.getMonth()+1}月${expiryDate.getDate()}日`;
+                const expiryJp   = this.toJapaneseDate(expiryDate);
+                const today = new Date(); today.setHours(0,0,0,0);
+                const diff  = Math.floor((expiryDate - today) / (1000*60*60*24));
+
+                let urgencyNote = '';
+                if (diff < 0)        urgencyNote = `<span style="color:#d32f2f;font-weight:bold;">⚠️ ${Math.abs(diff)}日超過</span>`;
+                else if (diff <= 30) urgencyNote = `<span style="color:#e65100;font-weight:bold;">🔴 残り${diff}日（至急）</span>`;
+                else if (diff <= 90) urgencyNote = `<span style="color:#f57c00;font-weight:bold;">🟠 残り${diff}日</span>`;
+                else                 urgencyNote = `<span style="color:#388e3c;">🟢 残り${diff}日</span>`;
+
+                document.getElementById('msgMeta').innerHTML =
+                    `<strong>${officer.companyName}</strong> ／ ${officer.officerType}<br>` +
+                    `満了日：${expiryStr}（${expiryJp}）　${urgencyNote}`;
+
+                const lineText  = this.buildLineMsg(officer, expiryStr, diff, profile);
+                const emailData = this.buildEmailMsg(officer, expiryStr, expiryJp, diff, profile);
+
+                document.getElementById('msgTextLine').value     = lineText;
+                document.getElementById('msgEmailSubject').value = emailData.subject;
+                document.getElementById('msgTextEmail').value    = emailData.body;
+
+                document.querySelectorAll('.msg-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+                document.getElementById('msgPanelLine').classList.add('active');
+                document.getElementById('msgPanelEmail').classList.remove('active');
+
+                ['copyBtnLine', 'copyBtnEmail'].forEach((id, i) => {
+                    const btn = document.getElementById(id);
+                    if (btn) {
+                        btn.textContent = i === 0 ? '📋 コピー' : '📋 本文コピー';
+                        btn.classList.remove('copied');
+                    }
+                });
+
+                document.getElementById('msgModal').style.display = 'block';
+            }
+
+            closeMsgModal() {
+                document.getElementById('msgModal').style.display = 'none';
+            }
+
+            switchMsgTab(type, clickedTab) {
+                document.querySelectorAll('.msg-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.msg-panel').forEach(p => p.classList.remove('active'));
+                if (clickedTab) clickedTab.classList.add('active');
+                document.getElementById(type === 'line' ? 'msgPanelLine' : 'msgPanelEmail').classList.add('active');
+            }
+
+            copyMsg(type) {
+                const ta  = document.getElementById(type === 'line' ? 'msgTextLine' : 'msgTextEmail');
+                const btn = document.getElementById(type === 'line' ? 'copyBtnLine' : 'copyBtnEmail');
+                if (!ta || !btn) return;
+
+                const done = () => {
+                    btn.textContent = '✅ コピーしました';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.textContent = type === 'line' ? '📋 コピー' : '📋 本文コピー';
+                        btn.classList.remove('copied');
+                    }, 2500);
+                };
+
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(ta.value).then(done).catch(() => {
+                        ta.select(); document.execCommand('copy'); done();
+                    });
+                } else {
+                    ta.select(); document.execCommand('copy'); done();
+                }
+            }
+
+            buildLineMsg(officer, expiryStr, diff, profile) {
+                const sender = profile.officeName
+                    ? `${profile.officeName}の${profile.officerName}`
+                    : '担当者';
+                const urgent = diff < 0 ? '【超過・要対応】' : diff <= 30 ? '【至急】' : '';
+
+                const bodyLine = diff < 0
+                    ? `${officer.companyName}の${officer.officerType}の任期がすでに満了しています（${expiryStr}）。\n早急に役員変更登記のお手続きが必要です。`
+                    : diff <= 30
+                    ? `${officer.companyName}の${officer.officerType}の任期満了まで残り${diff}日となりました（${expiryStr}）。\n至急、役員変更登記のご準備をお願いします。`
+                    : `${officer.companyName}の${officer.officerType}の任期満了日が近づいています（${expiryStr}）。\n役員変更登記のご準備をお願いします。`;
+
+                const contacts = [];
+                if (profile.mobile) contacts.push(`Mobile：${profile.mobile}`);
+                if (profile.tel)    contacts.push(`TEL：${profile.tel}`);
+                if (profile.email)  contacts.push(`Mail：${profile.email}`);
+                if (profile.line)   contacts.push(`LINE：${profile.line}`);
+                const contactBlock = contacts.length ? '\n\n' + contacts.join('\n') : '';
+                const noteBlock    = profile.msgNote ? `\n\n${profile.msgNote}` : '';
+
+                return `${urgent}お世話になっております。${sender}です。\n\n${bodyLine}\n\n手続きに必要な書類等は、改めてご案内いたします。ご不明な点はお気軽にご連絡ください。${noteBlock}${contactBlock}`;
+            }
+
+            buildEmailMsg(officer, expiryStr, expiryJp, diff, profile) {
+                const officeName  = profile.officeName  || '（事務所名未設定）';
+                const officerName = profile.officerName || '（担当者未設定）';
+                const title       = profile.title ? `${profile.title}　` : '';
+                const urgent      = diff < 0 ? '【超過・要対応】' : diff <= 30 ? '【至急】' : '';
+
+                const subject = `${urgent}役員任期満了のお知らせ（${officer.companyName}・${officer.officerType}）`;
+
+                const urgencyBody = diff < 0
+                    ? `貴社${officer.officerType}の任期は${expiryStr}（${expiryJp}）をもってすでに満了しております。\n登記懈怠となっておりますので、早急なお手続きをお願いいたします。`
+                    : diff <= 30
+                    ? `貴社${officer.officerType}の任期満了まで残り${diff}日（${expiryStr}）となりました。\n至急、役員変更登記のご準備をお願いいたします。`
+                    : `貴社${officer.officerType}の任期満了日（${expiryStr}／${expiryJp}）が近づいてまいりました。\n役員変更登記のご準備をお願いいたします。`;
+
+                const noteBlock = profile.msgNote ? `\n\n${profile.msgNote}\n` : '';
+
+                const sigLines = [`${officeName}`, `${title}${officerName}`];
+                if (profile.address) sigLines.push(profile.address);
+                if (profile.tel)     sigLines.push(`TEL：${profile.tel}`);
+                if (profile.mobile)  sigLines.push(`Mobile：${profile.mobile}`);
+                if (profile.email)   sigLines.push(`Mail：${profile.email}`);
+                if (profile.line)    sigLines.push(`LINE：${profile.line}`);
+                const signature = sigLines.join('\n');
+
+                const body =
+`${officer.companyName}
+ご担当者様
+
+お世話になっております。
+${officeName}の${officerName}です。
+
+${urgencyBody}
+
+手続きの流れは以下のとおりです。
+・株主総会（または社員総会）で役員の選任決議
+・就任承諾書のご準備
+・登記申請（満了日から2週間以内が原則）
+
+必要書類の詳細については、改めてご案内いたします。
+ご不明な点はお気軽にお問い合わせください。${noteBlock}
+
+${signature}`;
+
+                return { subject, body };
             }
         }
 
