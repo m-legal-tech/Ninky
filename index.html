@@ -2426,14 +2426,17 @@ const relevantOfficers = this.officers.filter(officer => {
             buildLineMsg(officer, expiryStr, diff, profile) {
                 const sender = profile.officeName
                     ? `${profile.officeName}の${profile.officerName}`
-                    : '担当者';
-                const urgent = diff < 0 ? '【超過・要対応】' : diff <= 30 ? '【至急】' : '';
+                    : profile.officerName || '担当者';
 
-                const bodyLine = diff < 0
-                    ? `${officer.companyName}の${officer.officerType}の任期がすでに満了しています（${expiryStr}）。\n早急に役員変更登記のお手続きが必要です。`
+                const urgentPrefix = diff < 0
+                    ? '【超過・要対応】'
                     : diff <= 30
-                    ? `${officer.companyName}の${officer.officerType}の任期満了まで残り${diff}日となりました（${expiryStr}）。\n至急、役員変更登記のご準備をお願いします。`
-                    : `${officer.companyName}の${officer.officerType}の任期満了日が近づいています（${expiryStr}）。\n役員変更登記のご準備をお願いします。`;
+                    ? '【任期満了のご案内】'
+                    : '【任期満了のご案内】';
+
+                const expiryLine = diff < 0
+                    ? `御社${officer.officerType}の任期がすでに満了しております（${expiryStr}）。\n法務局への役員変更登記の申請準備をお早めにお進めいただくことをお勧めいたします。\nなお、登記が遅れた場合、過料のペナルティが生じる場合がありますのでご注意ください。`
+                    : `御社${officer.officerType}の任期満了日が近づいております（${expiryStr}、残り${diff}日）。\n法務局への役員変更登記の申請準備をお早めにお進めいただくことをお勧めいたします。\nなお、登記が遅れた場合、過料のペナルティが生じる場合がありますのでご注意ください。`;
 
                 const contacts = [];
                 if (profile.mobile) contacts.push(`Mobile：${profile.mobile}`);
@@ -2441,26 +2444,42 @@ const relevantOfficers = this.officers.filter(officer => {
                 if (profile.email)  contacts.push(`Mail：${profile.email}`);
                 if (profile.line)   contacts.push(`LINE：${profile.line}`);
                 const contactBlock = contacts.length ? '\n\n' + contacts.join('\n') : '';
-                const noteBlock    = profile.msgNote ? `\n\n${profile.msgNote}` : '';
 
-                return `${urgent}お世話になっております。${sender}です。\n\n${bodyLine}\n\n手続きに必要な書類等は、改めてご案内いたします。ご不明な点はお気軽にご連絡ください。${noteBlock}${contactBlock}`;
+                return `${urgentPrefix}
+
+お世話になっております。${sender}です。
+
+${expiryLine}
+
+役員に変更がない場合でも、重任（再任）による変更登記が必要です。株主総会議事録などの関係書類の作成は当方で承りますので、まずはご返信ください。打ち合わせのうえ、手続きを進めます。
+
+━━━━ ご確認事項 ━━━━
+
+①決議予定日（株主総会または書面決議の日付）はいつ頃をお考えですか？
+
+②役員構成に変更はありますか？
+　・変更なし（全員重任）
+　・増員・交代（就任・辞任・死亡）あり
+　　→ 氏名・新住所・変更年月日等をお知らせください
+
+③役員の住所・氏名に変更はありますか？
+
+④会社の商号・本店所在地に変更はありますか？
+
+よろしくお願いいたします。${contactBlock}`;
             }
 
             buildEmailMsg(officer, expiryStr, expiryJp, diff, profile) {
                 const officeName  = profile.officeName  || '（事務所名未設定）';
                 const officerName = profile.officerName || '（担当者未設定）';
                 const title       = profile.title ? `${profile.title}　` : '';
-                const urgent      = diff < 0 ? '【超過・要対応】' : diff <= 30 ? '【至急】' : '';
 
-                const subject = `${urgent}役員任期満了のお知らせ（${officer.companyName}・${officer.officerType}）`;
+                const urgentPrefix = diff < 0 ? '【超過・要対応】' : '';
+                const subject = `${urgentPrefix}役員任期満了のお知らせ（${officer.companyName}・${officer.officerType}）`;
 
-                const urgencyBody = diff < 0
-                    ? `貴社${officer.officerType}の任期は${expiryStr}（${expiryJp}）をもってすでに満了しております。\n登記懈怠となっておりますので、早急なお手続きをお願いいたします。`
-                    : diff <= 30
-                    ? `貴社${officer.officerType}の任期満了まで残り${diff}日（${expiryStr}）となりました。\n至急、役員変更登記のご準備をお願いいたします。`
-                    : `貴社${officer.officerType}の任期満了日（${expiryStr}／${expiryJp}）が近づいてまいりました。\n役員変更登記のご準備をお願いいたします。`;
-
-                const noteBlock = profile.msgNote ? `\n\n${profile.msgNote}\n` : '';
+                const expiryLine = diff < 0
+                    ? `御社${officer.officerType}の任期はすでに満了しております（${expiryStr}／${expiryJp}）。\n法務局への役員変更登記の申請準備をお早めにお進めいただくことをお勧めいたします。\nなお、登記が遅れた場合、過料のペナルティが課される場合がございますのでご注意ください。`
+                    : `御社${officer.officerType}の任期満了日が近づいております（${expiryStr}／${expiryJp}、残り${diff}日）。\n法務局への役員変更登記の申請準備をお早めにお進めいただくことをお勧めいたします。\nなお、登記が遅れた場合、過料のペナルティが課される場合がございますのでご注意ください。`;
 
                 const sigLines = [`${officeName}`, `${title}${officerName}`];
                 if (profile.address) sigLines.push(profile.address);
@@ -2477,15 +2496,34 @@ const relevantOfficers = this.officers.filter(officer => {
 お世話になっております。
 ${officeName}の${officerName}です。
 
-${urgencyBody}
+${expiryLine}
 
-手続きの流れは以下のとおりです。
-・株主総会（または社員総会）で役員の選任決議
-・就任承諾書のご準備
-・登記申請（満了日から2週間以内が原則）
+役員に変更がない場合でも、重任（再任）による変更登記が必要です。株主総会議事録などの関係書類の作成は当方で承りますので、まずはご返信ください。打ち合わせのうえ、手続きを進めてまいります。
 
-必要書類の詳細については、改めてご案内いたします。
-ご不明な点はお気軽にお問い合わせください。${noteBlock}
+━━━━━━━━━━━━━━━━
+【ご確認事項】ご返信の際にお知らせください
+━━━━━━━━━━━━━━━━
+
+①　決議予定日
+　　書面決議（実際の総会は開かない）・実開催、いずれも可能です。
+　　ご希望の日付または時期をお知らせください。
+
+②　役員構成の変更
+　　□ 変更なし（全員重任）
+　　□ 変更あり（以下に該当するものをお知らせください）
+　　　・新規就任：氏名・住所・就任（承諾）年月日
+　　　・辞任：氏名・住所・辞任日
+　　　・死亡：氏名・住所・死亡日
+
+③　役員の住所・氏名の変更
+　　登記上の住所・氏名と現在が異なる場合はお知らせください。
+
+④　会社の商号・本店所在地の変更
+　　あわせて登記が必要な場合はお知らせください。
+
+━━━━━━━━━━━━━━━━
+
+どうぞよろしくお願いいたします。
 
 ${signature}`;
 
