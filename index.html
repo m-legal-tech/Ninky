@@ -817,6 +817,21 @@
         }
         .msg-email-subject-input:focus { outline: none; border-color: #667eea; }
 
+        /* ── 満了アラート一覧のボタン群レイアウト ── */
+        .action-buttons {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex-shrink: 0;
+        }
+        .officer-item {
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        .officer-item .expiry-date {
+          flex-shrink: 0;
+        }
+
         /* ── 通知文ボタン ── */
         .notify-btn {
           background: linear-gradient(135deg, #ff9800, #ffc107);
